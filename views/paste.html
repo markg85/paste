@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+    <link rel="icon" href="/images/paste_favicon.png">
+    
+    <link rel="stylesheet" href="/css/prism.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/prism.js"></script>
+    <script src="/js/jquery-2.1.4.min.js"></script>
+    <script src="/js/paste.js"></script>
+  </head>
+  <body>
+    <h1>{{ title }} - LOCALHOST</h1>
+    <a href="/{{ url }}">URL To paste</a> | <a href="/{{ url }}/raw">raw</a>
+    <pre class="line-numbers"><code class="language-{{ data.language }}">{{ data.data }}</code></pre>
+  </body>
+</html>
