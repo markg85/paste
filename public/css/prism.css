@@ -1,4 +1,4 @@
-/* http://prismjs.com/download.html?themes=prism-twilight&languages=markup+css+clike+javascript+bash+c+cpp+ini+php+php-extras+smarty+sql+swift+twig&plugins=line-numbers */
+/* http://prismjs.com/download.html?themes=prism-twilight&languages=markup+css+clike+javascript+bash+c+cpp+diff+ini+json+php+php-extras+smarty+sql+swift+twig&plugins=line-numbers+show-language */
 /**
  * prism.js Twilight theme
  * Based (more or less) on the Twilight theme originally of Textmate fame.
@@ -7,13 +7,14 @@
 code[class*="language-"],
 pre[class*="language-"] {
 	color: white;
-	direction: ltr;
-	font-family: Consolas, Monaco, 'Andale Mono', monospace;
+	background: none;
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 	text-align: left;
 	text-shadow: 0 -.1em .2em black;
 	white-space: pre;
 	word-spacing: normal;
 	word-break: normal;
+	word-wrap: normal;
 	line-height: 1.5;
 
 	-moz-tab-size: 4;
@@ -33,18 +34,21 @@ pre[class*="language-"],
 
 /* Code blocks */
 pre[class*="language-"] {
+	border-radius: .5em;
+	border: .3em solid hsl(0, 0%, 33%); /* #282A2B */
+	box-shadow: 1px 1px .5em black inset;
 	margin: .5em 0;
 	overflow: auto;
 	padding: 1em;
 }
 
-pre[class*="language-"]::selection {
-	/* Safari */
+pre[class*="language-"]::-moz-selection {
+	/* Firefox */
 	background: hsl(200, 4%, 16%); /* #282A2B */
 }
 
 pre[class*="language-"]::selection {
-	/* Firefox */
+	/* Safari */
 	background: hsl(200, 4%, 16%); /* #282A2B */
 }
 
@@ -67,6 +71,7 @@ code[class*="language-"]::selection, code[class*="language-"] ::selection {
 	border: .13em solid hsl(0, 0%, 33%); /* #545454 */
 	box-shadow: 1px 1px .3em -.1em black inset;
 	padding: .15em .2em .05em;
+	white-space: normal;
 }
 
 .token.comment,
@@ -154,11 +159,11 @@ pre[data-line] {
 }
 
 .line-highlight {
-	background: -moz-linear-gradient(left, hsla(0, 0%, 33%, .1) 70%, hsla(0, 0%, 33%, 0)); /* #545454 */
-	background: -o-linear-gradient(left, hsla(0, 0%, 33%, .1) 70%, hsla(0, 0%, 33%, 0)); /* #545454 */
-	background: -webkit-linear-gradient(left, hsla(0, 0%, 33%, .1) 70%, hsla(0, 0%, 33%, 0)); /* #545454 */
+	background: -moz-linear-gradient(to right, hsla(0, 0%, 33%, .1) 70%, hsla(0, 0%, 33%, 0)); /* #545454 */
+	background: -o-linear-gradient(to right, hsla(0, 0%, 33%, .1) 70%, hsla(0, 0%, 33%, 0)); /* #545454 */
+	background: -webkit-linear-gradient(to right, hsla(0, 0%, 33%, .1) 70%, hsla(0, 0%, 33%, 0)); /* #545454 */
 	background: hsla(0, 0%, 33%, 0.25); /* #545454 */
-	background: linear-gradient(left, hsla(0, 0%, 33%, .1) 70%, hsla(0, 0%, 33%, 0)); /* #545454 */
+	background: linear-gradient(to right, hsla(0, 0%, 33%, .1) 70%, hsla(0, 0%, 33%, 0)); /* #545454 */
 	border-bottom: 1px dashed hsl(0, 0%, 33%); /* #545454 */
 	border-top: 1px dashed hsl(0, 0%, 33%); /* #545454 */
 	left: 0;
@@ -236,3 +241,32 @@ pre.line-numbers > code {
 			padding-right: 0.8em;
 			text-align: right;
 		}
+div.prism-show-language {
+	position: relative;
+}
+
+div.prism-show-language > div.prism-show-language-label {
+	color: black;
+	background-color: #CFCFCF;
+	display: inline-block;
+	position: absolute;
+	bottom: auto;
+	left: auto;
+	top: 0;
+	right: 0;
+	width: auto;
+	height: auto;
+	font-size: 0.9em;
+	border-radius: 0 0 0 5px;
+	padding: 0 0.5em;
+	text-shadow: none;
+	z-index: 1;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	-webkit-transform: none;
+	-moz-transform: none;
+	-ms-transform: none;
+	-o-transform: none;
+	transform: none;
+}
