@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 var path = require('path');
 var swig = require('swig');
 
-server.listen(3000);
+server.listen(3010);
 
 // Database connection
 var db = mongoose.connection;
