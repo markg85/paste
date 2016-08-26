@@ -35,7 +35,7 @@ app.set('views', __dirname + '/views');
 // Set routes
 app.get('/', pasteRoutes.pastes);
 app.get('/:id?', pasteRoutes.paste);
-app.get('/:id/:decryptKey?', pasteRoutes.pasteDecrypt);
 app.get('/:id/raw', pasteRoutes.raw);
+app.get('/:id/:decryptKey?', pasteRoutes.pasteDecrypt);
 app.get('/:id/:decryptKey/raw', pasteRoutes.rawDecrypt);
 app.post('/', pasteRoutes.create);
