@@ -43,4 +43,32 @@ $(document).ready(function(){
         $("#pastePassword").val("");
         $("#pasteContent").val("");
     });
+
+  // This initiates inline re-styling and formatting of code. For now, only JSON data is supported.
+  $(document).keydown(function(e) {
+   
+    if (e.altKey && e.keyCode == 70) {
+      var langValue = $("#langList").val();
+      if (langValue != 'json') {
+        console.log("Only JSON is supported as inline formatting and styling experiment.")
+        return;
+      }
+
+      var codeElement = document.createElement('code')
+      codeElement.className = 'language-'+langValue
+      codeElement.textContent = JSON.stringify(JSON.parse($("#pasteContent").val()), null, 2)
+      
+
+      var preElement = document.createElement('pre')
+      preElement.appendChild(codeElement)
+      preElement.className = 'line-numbers'
+      
+      // Append the newly created element.
+      document.getElementById('pasteContent').replaceWith(preElement)
+      Prism.highlightElement(codeElement)
+      
+      e.preventDefault();
+      console.log("Hidden feature found! In place formatting!")
+    }
+  });
 });
