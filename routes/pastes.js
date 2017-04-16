@@ -144,3 +144,28 @@ exports.create = function(req, res){
     }
     res.send({ hash: newPaste._id, decryptKey: decryptKey, error:"none" })
 };
+
+exports.createRest = function(req, res){
+    var language = req.params.language;
+    var lifetime = 0; // unlimited
+
+    if (req.body.data == "") {
+        res.send({ hash: "", error:"Empty paste received. This is not allowed!" })
+        return;
+    }
+    
+    var newPaste = new Paste({ language: language, data: decodeURIComponent(req.body), lifetime: lifetime, encrypted: false });
+    
+    newPaste.save(function(err){
+      if(!err) {
+//        console.log("OK...")
+      } else {
+//        console.log(err)
+      }
+    });
+
+    var fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id + '\n';
+    res.writeHead(200, {"context-type":"text/plain"});
+    res.write(fullUrl);
+    res.end();
+};
