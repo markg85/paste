@@ -162,13 +162,13 @@ exports.getData = function(req, res) {
   }
 
   try {
-    fs.accessSync('uploads/' + file);
+    fs.accessSync(__dirname + '/uploads/' + file);
   } catch (e) {
     res.send("File not found on server. Its probably deleted or never uploaded.\n");
     return;
   }
 
-  fs.createReadStream('uploads/' + file).pipe(res);
+  fs.createReadStream(__dirname + '/uploads/' + file).pipe(res);
 }
 
 exports.createRest = function(req, res){
