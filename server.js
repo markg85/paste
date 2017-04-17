@@ -16,7 +16,8 @@ var storage = multer.diskStorage({
   }
 })
 
-var upload = multer({storage: storage});
+var upload = multer({storage: storage,
+                     limits: {fileSize: 10485760}}); // 10 MiB limit
 
 server.listen(3010);
 
