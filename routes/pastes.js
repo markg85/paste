@@ -2,6 +2,8 @@ var shortid = require('shortid');
 var mongoose = require('mongoose');
 var crypto = require('crypto');
 var fs = require('fs');
+var path = require('path');
+var appDir = path.dirname(require.main.filename);
 var algorithm = 'aes-256-ctr';
 
 var Schema = mongoose.Schema
@@ -162,13 +164,13 @@ exports.getData = function(req, res) {
   }
 
   try {
-    fs.accessSync(process.cwd() + '/uploads/' + file);
+    fs.accessSync(appDir + '/uploads/' + file);
   } catch (e) {
     res.send("File not found on server. Its probably deleted or never uploaded.\n");
     return;
   }
 
-  fs.createReadStream(process.cwd() + '/uploads/' + file).pipe(res);
+  fs.createReadStream(appDir + '/uploads/' + file).pipe(res);
 }
 
 exports.createRest = function(req, res){
