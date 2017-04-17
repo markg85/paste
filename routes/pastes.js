@@ -1,6 +1,7 @@
 var shortid = require('shortid');
 var mongoose = require('mongoose');
 var crypto = require('crypto');
+var fs = require('fs');
 var algorithm = 'aes-256-ctr';
 
 var Schema = mongoose.Schema
@@ -144,6 +145,31 @@ exports.create = function(req, res){
     }
     res.send({ hash: newPaste._id, decryptKey: decryptKey, error:"none" })
 };
+
+exports.uploadData = function(req, res) {
+  var fullUrl = req.protocol + '://' + req.get('host') + '/data/' + req.files[0].filename + '\n';
+  res.writeHead(200, {"context-type":"text/plain"});
+  res.write(fullUrl);
+  res.end();
+}
+
+exports.getData = function(req, res) {
+  var file = req.params.file;
+
+  if (file == "") {
+    res.send("No valid input given.\n")
+    return;
+  }
+
+  try {
+    fs.accessSync('uploads/' + file);
+  } catch (e) {
+    res.send("File not found on server. Its probably deleted or never uploaded.\n");
+    return;
+  }
+
+  fs.createReadStream('uploads/' + file).pipe(res);
+}
 
 exports.createRest = function(req, res){
     var language = req.params.language;
