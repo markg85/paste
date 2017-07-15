@@ -19,7 +19,7 @@ var storage = multer.diskStorage({
 var upload = multer({storage: storage,
                      limits: {fileSize: 10485760}}); // 10 MiB limit
 
-server.listen(3010);
+server.listen(80);
 
 // Database connection
 var db = mongoose.connection;
@@ -28,7 +28,7 @@ db.once('open', function callback () {
   console.log("database connection is open!")
 });
 
-mongoose.connect('mongodb://localhost/paste');
+mongoose.connect('mongodb://mongo/paste');
 
 swig.setDefaults({ cache: false });
 
