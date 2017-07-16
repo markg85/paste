@@ -198,7 +198,7 @@ exports.createRest = function(req, res){
         return;
     }
     
-    var newPaste = new Paste({ language: language, data: decodeURIComponent(req.body), lifetime: lifetime, encrypted: false });
+    var newPaste = new Paste({ language: language, data: req.body, lifetime: lifetime, encrypted: false });
     
     newPaste.save(function(err){
       if(!err) {
