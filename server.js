@@ -28,7 +28,9 @@ db.once('open', function callback () {
   console.log("database connection is open!")
 });
 
-mongoose.connect('mongodb://mongo/paste');
+mongoose.connect('mongodb://mongo/paste', {
+  useMongoClient: true
+});
 
 swig.setDefaults({ cache: false });
 
