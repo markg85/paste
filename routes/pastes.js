@@ -49,6 +49,8 @@ exports.paste = function(req, res){
         mongoose.model("Pastes").findOne({_id: id}, function(err, n){
             if (n) {
                 res.render('paste', {title: "Paste", url: n._id, data: n});
+            } else {
+                res.send("Paste not found.\n");
             }
         });
     }
