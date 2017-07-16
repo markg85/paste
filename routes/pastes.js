@@ -64,8 +64,12 @@ exports.pasteDecrypt = function(req, res){
         responseText = "No paste id provided."
     } else {
         mongoose.model("Pastes").findOne({_id: id}, function(err, n){
-            n.data = decrypt(n.data, req.params.decryptKey)
-            res.render('paste', {title: "Paste", url: n._id+"/"+req.params.decryptKey, data: n});
+            if (n) {
+              n.data = decrypt(n.data, req.params.decryptKey)
+              res.render('paste', {title: "Paste", url: n._id+"/"+req.params.decryptKey, data: n});
+            } else {
+              res.send("Paste not found.\n");
+            }
         });
     }
 };
@@ -76,9 +80,15 @@ exports.raw = function(req, res){
   
     if(id) {
         mongoose.model("Pastes").findOne({_id: id}, function(err, n){
+          if (n) {
             res.type('text/plain');
             res.send(n.data);
+          } else {
+            res.send("Paste not found.\n");
+          }
         });
+    } else {
+      res.send("Paste not found.\n");
     }
 };
 
@@ -88,9 +98,13 @@ exports.rawDecrypt = function(req, res){
   
     if(id) {
         mongoose.model("Pastes").findOne({_id: id}, function(err, n){
+          if (n) {
             n.data = decrypt(n.data, req.params.decryptKey)
             res.type('text/plain');
             res.send(n.data);
+          } else {
+            res.send("Paste not found.\n");
+          }
         });
     }
 };
