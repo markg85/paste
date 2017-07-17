@@ -50,7 +50,7 @@ exports.paste = function(req, res){
             if (n) {
                 res.render('paste', {title: "Paste", url: n._id, data: n});
             } else {
-                res.send("Paste not found.\n");
+                res.status(404).send("Paste not found.\n");
             }
         });
     }
@@ -68,7 +68,7 @@ exports.pasteDecrypt = function(req, res){
               n.data = decrypt(n.data, req.params.decryptKey)
               res.render('paste', {title: "Paste", url: n._id+"/"+req.params.decryptKey, data: n});
             } else {
-              res.send("Paste not found.\n");
+              res.status(404).send("Paste not found.\n");
             }
         });
     }
@@ -84,11 +84,11 @@ exports.raw = function(req, res){
             res.type('text/plain');
             res.send(n.data);
           } else {
-            res.send("Paste not found.\n");
+            res.status(404).send("Paste not found.\n");
           }
         });
     } else {
-      res.send("Paste not found.\n");
+      res.status(404).send("Paste not found.\n");
     }
 };
 
@@ -103,7 +103,7 @@ exports.rawDecrypt = function(req, res){
             res.type('text/plain');
             res.send(n.data);
           } else {
-            res.send("Paste not found.\n");
+            res.status(404).send("Paste not found.\n");
           }
         });
     }
@@ -175,14 +175,14 @@ exports.getData = function(req, res) {
   var file = req.params.file;
 
   if (file == "") {
-    res.send("No valid input given.\n")
+    res.status(404).send("No valid input given.\n")
     return;
   }
 
   try {
     fs.accessSync(appDir + '/uploads/' + file);
   } catch (e) {
-    res.send("File not found on server. Its probably deleted or never uploaded.\n");
+    res.status(404).send("File not found on server. Its probably deleted or never uploaded.\n");
     return;
   }
 
