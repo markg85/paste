@@ -14,9 +14,6 @@
     <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
     
     <link rel="stylesheet" href="/css/style.css">
-    <script src="/js/prism.js"></script>
-    <script src="/js/jquery-2.1.4.min.js"></script>
-    <script src="/js/paste.js"></script>
   </head>
   <body>
     <h1>{{ title }}</h1>
@@ -80,5 +77,8 @@
     <pre class="line-numbers"><code class="language-{{ paste.language }}">{{ paste.data }}</code></pre>
     {% endfor %}
     -->
+    <script async src="/js/prism.js"></script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script async src="/js/paste.js"></script>
   </body>
 </html>
