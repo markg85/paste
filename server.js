@@ -28,6 +28,8 @@ db.once('open', function callback () {
   console.log("database connection is open!")
 });
 
+// We now use native promises.
+mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://mongo/paste', {
   useMongoClient: true
 });
