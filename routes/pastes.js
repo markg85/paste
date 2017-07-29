@@ -149,7 +149,7 @@ exports.create = function(req, res){
 };
 
 exports.uploadData = function(req, res) {
-  let fullUrl = req.protocol + '://' + req.get('host') + '/data/' + req.files[0].filename + '\n';
+  let fullUrl = req.protocol + '://' + req.get('host') + '/data/' + req.files[0].filename;
   res.json({ url: fullUrl });
 }
 
@@ -157,14 +157,14 @@ exports.getData = function(req, res) {
   let file = req.params.file;
 
   if (file == "") {
-    res.status(404).json({ error: "No valid input given.\n" })
+    res.status(404).json({ error: "No valid input given." })
     return;
   }
 
   try {
     fs.accessSync(appDir + '/uploads/' + file);
   } catch (e) {
-    res.status(404).json({ error: "File not found on server. Its probably deleted or never uploaded.\n"});
+    res.status(404).json({ error: "File not found on server. Its probably deleted or never uploaded." });
     return;
   }
 
@@ -184,14 +184,13 @@ exports.createRest = function(req, res){
     
     newPaste.save(function(err){
       if(!err) {
-//        console.log("OK...")
+        res.error(500).json({ error: err });
       } else {
-//        console.log(err)
+        let fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id;
+        res.json({ id: newPaste._id, url: fullUrl });
       }
     });
 
-    let fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id + '\n';
-    res.json({ id: newPaste._id, url: fullUrl });
 };
 
 exports.fallback = function(req, res){
