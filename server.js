@@ -15,8 +15,7 @@ let storage = multer.diskStorage({
   }
 })
 
-let upload = multer({storage: storage,
-                     limits: {fileSize: 10485760}}); // 10 MiB limit
+let upload = multer({storage: storage, limits: {fileSize: 10485760}}); // 10 MiB limit
 
 server.listen(80);
 
@@ -33,19 +32,21 @@ mongoose.connect('mongodb://mongo/paste', {
   useMongoClient: true
 });
 
-let pasteRoutes = require('./routes/pastes');
 exports.app = app
 
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({
-    extended: true
+  extended: true
 }));
+
+// Load routes
+let pasteRoutes = require('./routes/pastes');
 
 // Upload for data
 app.get('/data/:file', pasteRoutes.getData);
 
-app.get('/:id?', pasteRoutes.paste);
+app.get('/:id', pasteRoutes.paste);
 app.get('/:id/raw', pasteRoutes.raw);
 app.get('/:id/:decryptKey?', pasteRoutes.pasteDecrypt);
 app.get('/:id/:decryptKey/raw', pasteRoutes.rawDecrypt);
