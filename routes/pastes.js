@@ -86,8 +86,7 @@ exports.rawDecrypt = function(req, res){
   mongoose.model("Pastes").findOne({_id: id}, function(err, n){
     if (n) {
       n.data = decrypt(n.data, req.params.decryptKey)
-      res.type('text/plain');
-      res.send(n.data);
+      res.json(n);
     } else {
       res.status(404).json({ error: "Paste not found." });
     }
@@ -117,7 +116,7 @@ exports.create = function(req, res){
   }
 
   if (req.body.data == "") {
-    res.status(500).send({ error: "Empty paste received. This is not allowed!" })
+    res.status(500).json({ error: "Empty paste received. This is not allowed!" })
     return;
   }
 
@@ -130,9 +129,10 @@ exports.create = function(req, res){
         res.status(500).json({ error: err });
       }
     });
+    res.json({ hash: newPaste._id, decryptKey: decryptKey })
+  } else {
+    res.status(500).json({ error: "You cannot paste without providing at least the language you want to paste in!" })
   }
-
-  res.json({ hash: newPaste._id, decryptKey: decryptKey })
 };
 
 exports.uploadData = function(req, res) {
@@ -173,7 +173,7 @@ exports.createRest = function(req, res){
   let newPaste = new Paste({ language: language, data: req.body, lifetime: lifetime, encrypted: false });
 
   newPaste.save(function(err){
-    if(!err) {
+    if(err) {
       res.status(500).json({ error: err });
     } else {
       let fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id;
