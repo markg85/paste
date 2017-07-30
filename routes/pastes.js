@@ -1,10 +1,12 @@
 let shortid = require('shortid');
 let mongoose = require('mongoose');
 let crypto = require('crypto');
-let fs = require('fs');
 let path = require('path');
 let appDir = path.dirname(require.main.filename);
 let algorithm = 'aes-256-ctr';
+let express = require('express');
+let router = express.Router();
+
 
 let Schema = mongoose.Schema
 
@@ -39,61 +41,45 @@ function decrypt(text, password){
   return dec;
 }
 
-exports.paste = function(req, res){
+// Handle file logic.
+router.param('id', (req, res, next, id) => {
+  if (!id) {
+    res.status(500).json({ error: "No valid ID provided." });
+  }
+
+  mongoose.model("Pastes").findOne({_id: id}, function(err, n){
+    if (n) {
+      req.idFromDb = n;
+      next();
+    } else {
+      res.status(404).json({ error: "Paste not found." });
+    }
+  });
+});
+
+router.get('/:id', (req, res) => {
   console.log("..paste");
-  let id = req.params.id
+  res.json(req.idFromDb);
+});
 
-  mongoose.model("Pastes").findOne({_id: id}, function(err, n){
-    if (n) {
-      res.json(n);
-    } else {
-      res.status(404).json({ error: "Paste not found." });
-    }
-  });
-};
-
-exports.pasteDecrypt = function(req, res){
+router.get('/:id/:decryptKey?', (req, res) => {
   console.log("..pasteDecrypt");
-  let id = req.params.id
-  mongoose.model("Pastes").findOne({_id: id}, function(err, n){
-    if (n) {
-      res.json(n);
-    } else {
-      res.status(404).json({ error: "Paste not found." });
-    }
-  });
-};
+  req.idFromDb.data = decrypt(req.idFromDb.data, req.params.decryptKey)
+  res.json(req.idFromDb);
+});
 
-exports.raw = function(req, res){
+router.get('/:id/raw', (req, res) => {
   console.log("..raw")
-  let id = req.params.id
-  let responseText = "";
+  res.json(req.idFromDb);
+});
 
-  mongoose.model("Pastes").findOne({_id: id}, function(err, n){
-    if (n) {
-      res.json(n);
-    } else {
-      res.status(404).json({ error: "Paste not found." });
-    }
-  });
-};
-
-exports.rawDecrypt = function(req, res){
+router.get('/:id/:decryptKey/raw', (req, res) => {
   console.log("..rawDecrypt")
-  let id = req.params.id
-  let responseText = "";
+  req.idFromDb.data = decrypt(req.idFromDb.data, req.params.decryptKey)
+  res.json(req.idFromDb);
+});
 
-  mongoose.model("Pastes").findOne({_id: id}, function(err, n){
-    if (n) {
-      n.data = decrypt(n.data, req.params.decryptKey)
-      res.json(n);
-    } else {
-      res.status(404).json({ error: "Paste not found." });
-    }
-  });
-};
-
-exports.create = function(req, res){
+router.post('/', (req, rs) => {
   console.log("..create");
   if (req.body.lifetime == 7) {
     req.body.lifetime = 0 // unlimited
@@ -133,34 +119,34 @@ exports.create = function(req, res){
   } else {
     res.status(500).json({ error: "You cannot paste without providing at least the language you want to paste in!" })
   }
-};
+});
 
-exports.uploadData = function(req, res) {
+router.post('/data', (req, res) => {
   console.log("..uploadData")
   let fullUrl = req.protocol + '://' + req.get('host') + '/data/' + req.files[0].filename;
   res.json({ url: fullUrl });
-}
+});
 
-exports.getData = function(req, res) {
-  console.log("..getData")
-  let file = req.params.file;
-
+// Handle file logic.
+router.param('file', (req, res, next, file) => {
   if (file == "") {
     res.status(404).json({ error: "No valid input given." })
-    return;
   }
 
   try {
     fs.accessSync(appDir + '/uploads/' + file);
+    next();
   } catch (e) {
     res.status(404).json({ error: "File not found on server. Its probably deleted or never uploaded." });
-    return;
   }
+});
 
-  fs.createReadStream(appDir + '/uploads/' + file).pipe(res);
-}
+router.get('/data/:file', (req, res) => {
+  console.log("..getData")
+  res.sendFile(appDir + '/uploads/' + file);
+});
 
-exports.createRest = function(req, res){
+router.post('/:language', (req, res) => {
   console.log("..createRest")
   let language = req.params.language;
   let lifetime = 0; // unlimited
@@ -180,8 +166,10 @@ exports.createRest = function(req, res){
       res.json({ id: newPaste._id, url: fullUrl });
     }
   });
-};
+});
 
-exports.fallback = function(req, res){
+router.all('*', (req, res) => {
   res.status(404).json({ error: "This route does not exist!" });
-};
+});
+
+module.exports = router;
