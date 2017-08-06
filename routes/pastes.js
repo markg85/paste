@@ -41,6 +41,55 @@ function decrypt(text, password){
   return dec;
 }
 
+let emptyPaste = {
+  lifetime: 0,
+  language: "cpp",
+  encrypted: false,
+  data: ""
+}
+
+function objectValidation(object) {
+  // Lifetime
+  if (object.lifetime < 0 || object.lifetime > lifeTimes.length) {
+    console.log("The provided lifetime is of an invalid number.");
+    return false;
+  }
+
+  if (typeof(object.encrypted) != "boolean") {
+    console.log("The encrypted type is not a boolean!");
+    return false;
+  }
+
+  // TODO: check for the actual allowed types...
+  if (typeof(object.language) != "string") {
+    console.log("The language is not a string!");
+    return false;
+  }
+
+  if (typeof(object.data) != "string") {
+    console.log("The data is not a string!");
+    return false;
+  }
+
+  if (object.data.length < 3) {
+    console.log("The data needs to be at least 3 characters long!");
+    return false;
+  }
+
+  return true;
+}
+
+function createPaste(inputData) {
+  let copy = Object.assign({}, emptyPaste, inputData);
+
+  if (!objectValidation(copy)) {
+    console.log("Aborting paste creation. There is invalid data!");
+    return Promise.reject(new Error('Aborting paste creation. There is invalid data!'));
+  }
+
+  return Paste(copy).save();
+}
+
 // Handle file logic.
 router.param('id', (req, res, next, id) => {
   if (!id) {
@@ -79,7 +128,7 @@ router.get('/:id/:decryptKey/raw', (req, res) => {
   res.json(req.idFromDb);
 });
 
-router.post('/', (req, rs) => {
+router.post('/', (req, res) => {
   console.log("..create");
   if (req.body.lifetime == 7) {
     req.body.lifetime = 0 // unlimited
@@ -87,6 +136,11 @@ router.post('/', (req, rs) => {
     req.body.lifetime = lifeTimes[5] // 1 month lifetime
   } else {
     req.body.lifetime = lifeTimes[req.body.lifetime]
+  }
+
+  if (typeof req.body.encryptPaste == 'undefined') {
+    res.status(500).json({ error: "There is data missing in the headers and/or body of your request!" });
+    return;
   }
 
   // Weird.. the "encryptPaste" value is a string, not a bool.. It does contain only "true" or "false" so just parsing it fixes it.
@@ -101,24 +155,18 @@ router.post('/', (req, rs) => {
     decryptKey = encryptResult.password;
   }
 
-  if (req.body.data == "") {
-    res.status(500).json({ error: "Empty paste received. This is not allowed!" })
-    return;
+  let pasteDataObj = {
+    lifetime: req.body.lifetime,
+    language: req.body.language,
+    encrypted: req.body.encryptedPaste,
+    data: pasteData
   }
 
-  let newPaste;
-  if (req.body.language) {
-    newPaste = new Paste({ language: req.body.language, data: pasteData, lifetime: req.body.lifetime, encrypted: req.body.encryptPaste });
-
-    newPaste.save(function(err){
-      if(err) {
-        res.status(500).json({ error: err });
-      }
-    });
-    res.json({ hash: newPaste._id, decryptKey: decryptKey })
-  } else {
-    res.status(500).json({ error: "You cannot paste without providing at least the language you want to paste in!" })
-  }
+  createPaste(pasteDataObj).then((obj) => {
+    res.json({ hash: obj._id, decryptKey: decryptKey })
+  }).catch((error) => {
+    res.status(500).json({ error: error })
+  });
 });
 
 router.post('/data', (req, res) => {
@@ -148,23 +196,19 @@ router.get('/data/:file', (req, res) => {
 
 router.post('/:language', (req, res) => {
   console.log("..createRest")
-  let language = req.params.language;
-  let lifetime = 0; // unlimited
 
-  if (req.body.data == "") {
-    res.json({ hash: "", error:"Empty paste received. This is not allowed!" })
-    return;
+  let pasteDataObj = {
+    lifetime: 0,
+    language: req.params.language,
+    encrypted: false,
+    data: req.body
   }
 
-  let newPaste = new Paste({ language: language, data: req.body, lifetime: lifetime, encrypted: false });
-
-  newPaste.save(function(err){
-    if(err) {
-      res.status(500).json({ error: err });
-    } else {
-      let fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id;
-      res.json({ id: newPaste._id, url: fullUrl });
-    }
+  createPaste(pasteDataObj).then((obj) => {
+    let fullUrl = req.protocol + '://' + req.get('host') + '/' + obj._id;
+    res.json({ id: obj._id, url: fullUrl });
+  }).catch((error) => {
+    res.status(500).json({ error: error })
   });
 });
 
