@@ -34,7 +34,7 @@ mongoose.connect('mongodb://mongo/paste', {
 
 exports.app = app
 
-// Handle JSON input
+// Handle various input types
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({
