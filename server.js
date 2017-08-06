@@ -32,8 +32,6 @@ mongoose.connect('mongodb://mongo/paste', {
   useMongoClient: true
 });
 
-exports.app = app
-
 // Handle various input types
 app.use(bodyParser.json());
 app.use(bodyParser.text());
