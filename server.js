@@ -17,19 +17,16 @@ let storage = multer.diskStorage({
 
 let upload = multer({storage: storage, limits: {fileSize: 10485760}}); // 10 MiB limit
 
-server.listen(80);
-
-// Database connection
-let db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback () {
-  console.log("database connection is open!")
-});
-
 // We now use native promises.
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://mongo/paste', {
-  useMongoClient: true
+
+// Create mongoose db connection.
+mongoose.connect('mongodb://mongo/paste', { useMongoClient: true }).then(() => {
+  console.log("Database connection established.");
+  server.listen(80);
+  console.log("Server open on port: " + server.address().port);
+}).catch(error => {
+  console.log("Unable to create database connection.");
 });
 
 // Handle various input types
