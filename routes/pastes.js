@@ -90,6 +90,22 @@ function createPaste(inputData) {
   return Paste(copy).save();
 }
 
+function isDecryptable(req, res) {
+  if (!req.idFromDb) {
+    return false;
+  }
+
+  if (!(req.params.decryptKey)) {
+    return false;
+  }
+
+  if (!req.idFromDb.encrypted) {
+    return false;
+  }
+
+  return true;
+}
+
 // Handle file logic.
 router.param('id', (req, res, next, id) => {
   if (!id) {
@@ -111,25 +127,40 @@ router.get('/:id', (req, res) => {
   res.json(req.idFromDb);
 });
 
-router.get('/:id/:decryptKey?', (req, res) => {
-  console.log("..pasteDecrypt");
-  req.idFromDb.data = decrypt(req.idFromDb.data, req.params.decryptKey)
-  res.json(req.idFromDb);
-});
-
 router.get('/:id/raw', (req, res) => {
   console.log("..raw")
   res.json(req.idFromDb);
 });
 
+router.get('/:id/:decryptKey?', (req, res) => {
+  console.log("..pasteDecrypt");
+  if (!isDecryptable(req, res)) {
+    res.status(500).json({ error: "No valid input data." });
+    return;
+  }
+
+  req.idFromDb.data = decrypt(req.idFromDb.data, req.params.decryptKey)
+  res.json(req.idFromDb);
+});
+
 router.get('/:id/:decryptKey/raw', (req, res) => {
   console.log("..rawDecrypt")
+  if (!isDecryptable(req, res)) {
+    res.status(500).json({ error: "No valid input data." });
+    return;
+  }
+
   req.idFromDb.data = decrypt(req.idFromDb.data, req.params.decryptKey)
   res.json(req.idFromDb);
 });
 
 router.post('/', (req, res) => {
+  // TODO: Reqrite this part to make use of a custom header: "X-Paste-Metadata".
+  // The client side must put the attributes in it as a json document. We parse it as is and see how it turns out.
   console.log("..create");
+
+  console.log(req.headers)
+
   if (req.body.lifetime == 7) {
     req.body.lifetime = 0 // unlimited
   } else if (req.body.lifetime > 6) {
