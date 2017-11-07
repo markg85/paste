@@ -39,10 +39,15 @@ swig.setDefaults({ cache: false });
 var pasteRoutes = require('./routes/pastes');
 exports.app = app
 
-app.use(bodyParser.json());
-app.use(bodyParser.text());
+app.use(bodyParser.json({
+  limit: '5mb'
+}));
+app.use(bodyParser.text({
+  limit: '5mb'
+}));
 app.use(bodyParser.urlencoded({
-    extended: true
+  extended: true,
+  limit: '5mb'
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
