@@ -209,7 +209,5 @@ exports.createRest = function(req, res){
     });
 
     var fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id + '\n';
-    res.writeHead(200, {"context-type":"text/plain"});
-    res.write(fullUrl);
-    res.end();
+    res.json({ id: newPaste._id, url: fullUrl });
 };
