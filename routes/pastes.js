@@ -208,6 +208,6 @@ exports.createRest = function(req, res){
       }
     });
 
-    var fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id + '\n';
+    var fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id;
     res.json({ id: newPaste._id, url: fullUrl });
 };
