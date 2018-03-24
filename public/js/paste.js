@@ -5,6 +5,7 @@ function toggleAction(e) {
 
 $(document).ready(function(){
     
+    $('.auto-save').savy('load');
     $('#plain_paste').on('click', toggleAction);
     $('#encrypted_paste').on('click', toggleAction);
     

@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/prism.js"></script>
     <script src="/js/jquery-2.1.4.min.js"></script>
+    <script src="/js/savy.min.js"></script>
     <script src="/js/paste.js"></script>
   </head>
   <body>
@@ -32,7 +33,7 @@
                 -->
                 <div class="col-md-6">
                     <label for="langList">Paste language</label>
-                    <select class="form-control" id="langList">
+                    <select class="form-control auto-save" id="langList">
                         <option value="cpp">C++</option>
                         <option value="c">C</option>
                         <option value="bash">Bash</option>
@@ -46,7 +47,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="lifetimeList">Lifetime</label>
-                    <select class="form-control" id="lifetimeList">
+                    <select class="form-control auto-save" id="lifetimeList">
                         <option value="0">1 hour</option>
                         <option value="1">4 hours</option>
                         <option value="2">1 day</option>
