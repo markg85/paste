@@ -179,14 +179,13 @@ exports.getData = function(req, res) {
     return;
   }
 
-  try {
-    fs.accessSync(appDir + '/uploads/' + file);
-  } catch (e) {
-    res.status(404).send("File not found on server. Its probably deleted or never uploaded.\n");
-    return;
-  }
-
-  fs.createReadStream(appDir + '/uploads/' + file).pipe(res);
+  var fullFile = appDir + '/uploads/' + file
+  res.download(fullFile, function(err){
+    if (err) {
+        console.log("File download error:");
+        console.log(err);
+    }
+  });
 }
 
 exports.createRest = function(req, res){
