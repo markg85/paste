@@ -165,7 +165,7 @@ exports.create = function(req, res){
 };
 
 exports.uploadData = function(req, res) {
-  var fullUrl = req.protocol + '://' + req.get('host') + '/data/' + req.files[0].filename + '\n';
+  var fullUrl = 'https://' + req.get('host') + '/data/' + req.files[0].filename + '\n';
   res.writeHead(200, {"context-type":"text/plain"});
   res.write(fullUrl);
   res.end();
