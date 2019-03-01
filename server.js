@@ -8,23 +8,27 @@ var swig = require('swig');
 var multer = require('multer');
 
 var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: function(req, file, cb) {
     cb(null, __dirname + '/uploads')
   },
-  filename: function (req, file, cb) {
+  filename: function(req, file, cb) {
     cb(null, Date.now() + '_' + file.originalname)
   }
 })
 
-var upload = multer({storage: storage,
-                     limits: {fileSize: 10485760}}); // 10 MiB limit
+var upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 10485760
+  }
+}); // 10 MiB limit
 
 server.listen(80);
 
 // Database connection
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback () {
+db.once('open', function callback() {
   console.log("database connection is open!")
 });
 
@@ -34,7 +38,9 @@ mongoose.connect('mongodb://mongo/paste', {
   useMongoClient: true
 });
 
-swig.setDefaults({ cache: false });
+swig.setDefaults({
+  cache: false
+});
 
 var pasteRoutes = require('./routes/pastes');
 exports.app = app
