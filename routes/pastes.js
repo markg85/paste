@@ -1,4 +1,4 @@
-var shortid = require('shortid');
+var base58 = require('base58');
 var mongoose = require('mongoose');
 var crypto = require('crypto');
 var fs = require('fs');
@@ -10,13 +10,55 @@ var Schema = mongoose.Schema
 
 var lifeTimes = [3600, 14400, 86400, 604800, 1209600, 2419200, 31536000]
     
+async function generate(number) {
+
+  let hash = () => {
+    let data = ''
+    for (let i = 0; i < 5; i++) {
+      data += base58.int_to_base58(Math.floor(Math.random() * 58))
+    }
+
+    return data;
+  };
+
+  let newId = hash();
+
+  // It should not enter this loop more then once.
+  // The more pastes are stored, the more likely it enters this loop multiple times.
+  for (let i = 0; i < 100; i++) {
+    let res = await mongoose.model("Pastes").findOne({_id: newId});
+
+    if (res == null) {
+      break;
+    }
+
+    console.log('We had a hash collision here! The more pastes we have the more collisions will occur. If this message happens too often, increase hash length! Loop entry count: ' + i)
+  }
+
+  return new Promise((resolve, reject) => {
+    resolve(newId)
+  });
+}
+
 var pasteSchema = new Schema({
-    _id: { type: String, unique: true, 'default': shortid.generate },
+  _id: { type: String, unique: true, 'default': '' },
     date: { type: Date, default: Date.now },
     language: String,
     lifetime: { type: Number, default: 2419200 },
     encrypted: { type: Boolean, default: true},
     data: String
+});
+
+pasteSchema.pre('save', async function(next) {
+  try {
+    let newId = await generate();
+    this._id = newId;
+    return next();
+  } catch (e) {
+    console.log('Error while pre-saving! Error:')
+    console.log(JSON.stringify(e))
+    next(e);
+  }
 });
 
 var Paste = mongoose.model('Pastes', pasteSchema);
@@ -44,15 +86,15 @@ exports.paste = function(req, res){
     var responseText = "";
   
     if(!id) {
-        responseText = "No paste id provided."
+      responseText = "No paste id provided."
     } else {
-        mongoose.model("Pastes").findOne({_id: id}, function(err, n){
-            if (n) {
-                res.render('paste', {title: "Paste", url: n._id, data: n});
-            } else {
-                res.status(404).send("Paste not found.\n");
-            }
-        });
+      mongoose.model("Pastes").findOne({_id: id}, function(err, n){
+	if (n) {
+	  res.render('paste', {title: "Paste", url: n._id, data: n});
+	} else {
+	  res.status(404).send("Paste not found.\n");
+	}
+      });
     }
 };
 
@@ -63,14 +105,14 @@ exports.pasteDecrypt = function(req, res){
     if(!id) {
         responseText = "No paste id provided."
     } else {
-        mongoose.model("Pastes").findOne({_id: id}, function(err, n){
-            if (n) {
-              n.data = decrypt(n.data, req.params.decryptKey)
-              res.render('paste', {title: "Paste", url: n._id+"/"+req.params.decryptKey, data: n});
-            } else {
-              res.status(404).send("Paste not found.\n");
-            }
-        });
+      mongoose.model("Pastes").findOne({_id: id}, function(err, n){
+	  if (n) {
+	    n.data = decrypt(n.data, req.params.decryptKey)
+	    res.render('paste', {title: "Paste", url: n._id+"/"+req.params.decryptKey, data: n});
+	  } else {
+	    res.status(404).send("Paste not found.\n");
+	  }
+      });
     }
 };
 
@@ -152,16 +194,15 @@ exports.create = function(req, res){
     if (req.body.language) {
         newPaste = new Paste({ language: req.body.language, data: pasteData, lifetime: req.body.lifetime, encrypted: req.body.encryptPaste });
         newPaste.save(function(err){
-                    
-                    if(!err) {
-                        //console.log("OK...")
-                    } else {
-                        //console.log(err)
-                    }
-                    
-                });
+	
+	if(!err) {
+	  res.send({ hash: newPaste._id, decryptKey: decryptKey, error: "none" })
+	} else {
+	  res.status(404).send("Error while storing paste in database.\n")
+	  console.log(err)
+	}
+      });
     }
-    res.send({ hash: newPaste._id, decryptKey: decryptKey, error:"none" })
 };
 
 exports.uploadData = function(req, res) {
@@ -201,12 +242,11 @@ exports.createRest = function(req, res){
     
     newPaste.save(function(err){
       if(!err) {
-//        console.log("OK...")
+	var fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id;
+	res.json({ id: newPaste._id, url: fullUrl });
       } else {
-//        console.log(err)
+	console.log(err)
       }
     });
 
-    var fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id;
-    res.json({ id: newPaste._id, url: fullUrl });
 };
