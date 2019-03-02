@@ -35,7 +35,8 @@ db.once('open', function callback() {
 // We now use native promises.
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://mongo/paste', {
-  useMongoClient: true
+  useNewUrlParser: true,
+  useCreateIndex: true
 });
 
 swig.setDefaults({

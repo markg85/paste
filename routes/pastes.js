@@ -45,8 +45,7 @@ async function generate(number) {
 var pasteSchema = new Schema({
   _id: {
     type: String,
-    unique: true,
-    'default': ''
+    'default': 'hashed'
   },
   date: {
     type: Date,
@@ -99,7 +98,7 @@ function decrypt(text, password) {
   return dec;
 }
 
-exports.paste = function(req, res) {
+exports.paste = (req, res) => {
   var id = req.params.id
   var responseText = "";
 
@@ -122,7 +121,7 @@ exports.paste = function(req, res) {
   }
 };
 
-exports.pasteDecrypt = function(req, res) {
+exports.pasteDecrypt = (req, res) => {
   var id = req.params.id
   var responseText = "";
 
@@ -146,7 +145,7 @@ exports.pasteDecrypt = function(req, res) {
   }
 };
 
-exports.raw = function(req, res) {
+exports.raw = (req, res) => {
   var id = req.params.id
   var responseText = "";
 
@@ -166,7 +165,7 @@ exports.raw = function(req, res) {
   }
 };
 
-exports.rawDecrypt = function(req, res) {
+exports.rawDecrypt = (req, res) => {
   var id = req.params.id
   var responseText = "";
 
@@ -185,7 +184,7 @@ exports.rawDecrypt = function(req, res) {
   }
 };
 
-exports.pastes = function(req, res) {
+exports.pastes = (req, res) => {
   /*
   mongoose.model("Pastes").find(function(err, pastes){
       console.log(err);
@@ -199,7 +198,7 @@ exports.pastes = function(req, res) {
   });
 };
 
-exports.create = function(req, res) {
+exports.create = (req, res) => {
 
   if (req.body.lifetime == 7) {
     req.body.lifetime = 0 // unlimited
@@ -253,7 +252,7 @@ exports.create = function(req, res) {
   }
 };
 
-exports.uploadData = function(req, res) {
+exports.uploadData = (req, res) => {
   var fullUrl = 'https://' + req.get('host') + '/data/' + req.files[0].filename + '\n';
   res.writeHead(200, {
     "context-type": "text/plain"
@@ -262,7 +261,7 @@ exports.uploadData = function(req, res) {
   res.end();
 }
 
-exports.getData = function(req, res) {
+exports.getData = (req, res) => {
   var file = req.params.file;
 
   if (file == "") {
@@ -279,7 +278,7 @@ exports.getData = function(req, res) {
   });
 }
 
-exports.createRest = function(req, res) {
+exports.createRest = (req, res) => {
   var language = req.params.language;
   var lifetime = 0; // unlimited
 
