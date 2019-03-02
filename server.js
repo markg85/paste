@@ -58,6 +58,13 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use((err, req, res, next) => {
+  // log the error...
+  console.log('We had an error!')
+  console.log(JSON.stringify(err))
+  res.sendStatus(err.httpStatusCode).json(err)
+})
+
 app.engine('html', swig.renderFile);
 app.set('view engine', 'html');
 app.set('views', __dirname + '/views');

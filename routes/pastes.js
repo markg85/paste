@@ -98,7 +98,7 @@ function decrypt(text, password) {
   return dec;
 }
 
-exports.paste = (req, res) => {
+exports.paste = async (req, res) => {
   var id = req.params.id
   var responseText = "";
 
@@ -121,7 +121,7 @@ exports.paste = (req, res) => {
   }
 };
 
-exports.pasteDecrypt = (req, res) => {
+exports.pasteDecrypt = async (req, res) => {
   var id = req.params.id
   var responseText = "";
 
@@ -145,7 +145,7 @@ exports.pasteDecrypt = (req, res) => {
   }
 };
 
-exports.raw = (req, res) => {
+exports.raw = async (req, res) => {
   var id = req.params.id
   var responseText = "";
 
@@ -184,7 +184,7 @@ exports.rawDecrypt = (req, res) => {
   }
 };
 
-exports.pastes = (req, res) => {
+exports.pastes = async (req, res) => {
   /*
   mongoose.model("Pastes").find(function(err, pastes){
       console.log(err);
@@ -198,7 +198,7 @@ exports.pastes = (req, res) => {
   });
 };
 
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
 
   if (req.body.lifetime == 7) {
     req.body.lifetime = 0 // unlimited
