@@ -28,10 +28,19 @@ server.listen(80);
 
 // Database connection
 var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback() {
-  console.log("database connection is open!")
-});
+
+db.on('connecting', () => console.log('connecting to MongoDB...'))
+  .on('connected', () => console.log('MongoDB connected...'))
+  .on('reconnected', () => console.log('MongoDB reconnected!'))
+  .on('disconnecting', () => console.log('MongoDB disconnecting...'))
+  .on('timeout', (e) => console.log('MongoDB timeout ->', e))
+  .on('disconnected', () => console.log('MongoDB disconnected'))
+  .on('error', () => {
+       mongoose.disconnect();
+       console.log('Failed to connect to MongoDB.')
+  })
+  .once('open', () => console.log('MongoDB connection opened! DONE!'))
+
 
 // We now use native promises.
 mongoose.Promise = global.Promise;
