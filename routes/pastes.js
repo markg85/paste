@@ -1,14 +1,14 @@
-var base58 = require('base58');
-var mongoose = require('mongoose');
-var crypto = require('crypto');
-var fs = require('fs');
-var path = require('path');
-var appDir = path.dirname(require.main.filename);
-var algorithm = 'aes-256-ctr';
+const base58 = require('base58');
+const mongoose = require('mongoose');
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const appDir = path.dirname(require.main.filename);
+const algorithm = 'aes-256-ctr';
 
-var Schema = mongoose.Schema
+const Schema = mongoose.Schema
 
-var lifeTimes = [3600, 14400, 86400, 604800, 1209600, 2419200, 31536000]
+const lifeTimes = [3600, 14400, 86400, 604800, 1209600, 2419200, 31536000]
 
 async function generate(number) {
 
@@ -42,7 +42,7 @@ async function generate(number) {
   });
 }
 
-var pasteSchema = new Schema({
+const pasteSchema = new Schema({
   _id: {
     type: String,
     'default': 'hashed'
@@ -75,14 +75,14 @@ pasteSchema.pre('save', async function(next) {
   }
 });
 
-var Paste = mongoose.model('Pastes', pasteSchema);
+let Paste = mongoose.model('Pastes', pasteSchema);
 
 function encrypt(text) {
-  var current_date = (new Date()).valueOf().toString();
-  var random = Math.random().toString();
-  var password = crypto.createHash('sha1').update(current_date + random).digest('hex');
-  var cipher = crypto.createCipher(algorithm, password)
-  var crypted = cipher.update(text, 'utf8', 'hex')
+  let current_date = (new Date()).valueOf().toString();
+  let random = Math.random().toString();
+  let password = crypto.createHash('sha1').update(current_date + random).digest('hex');
+  let cipher = crypto.createCipher(algorithm, password)
+  let crypted = cipher.update(text, 'utf8', 'hex')
   crypted += cipher.final('hex');
 
   return {
@@ -92,15 +92,15 @@ function encrypt(text) {
 }
 
 function decrypt(text, password) {
-  var decipher = crypto.createDecipher(algorithm, password)
-  var dec = decipher.update(text, 'hex', 'utf8')
+  let decipher = crypto.createDecipher(algorithm, password)
+  let dec = decipher.update(text, 'hex', 'utf8')
   dec += decipher.final('utf8');
   return dec;
 }
 
 exports.paste = async (req, res) => {
-  var id = req.params.id
-  var responseText = "";
+  let id = req.params.id
+  let responseText = "";
 
   if (!id) {
     responseText = "No paste id provided."
@@ -122,8 +122,8 @@ exports.paste = async (req, res) => {
 };
 
 exports.pasteDecrypt = async (req, res) => {
-  var id = req.params.id
-  var responseText = "";
+  let id = req.params.id
+  let responseText = "";
 
   if (!id) {
     responseText = "No paste id provided."
@@ -146,8 +146,8 @@ exports.pasteDecrypt = async (req, res) => {
 };
 
 exports.raw = async (req, res) => {
-  var id = req.params.id
-  var responseText = "";
+  let id = req.params.id
+  let responseText = "";
 
   if (id) {
     mongoose.model("Pastes").findOne({
@@ -166,8 +166,8 @@ exports.raw = async (req, res) => {
 };
 
 exports.rawDecrypt = (req, res) => {
-  var id = req.params.id
-  var responseText = "";
+  let id = req.params.id
+  let responseText = "";
 
   if (id) {
     mongoose.model("Pastes").findOne({
@@ -211,11 +211,11 @@ exports.create = async (req, res) => {
   // Weird.. the "encryptPaste" value is a string, not a bool.. It does contain only "true" or "false" so just parsing it fixes it.
   req.body.encryptPaste = JSON.parse(req.body.encryptPaste)
 
-  var pasteData = req.body.data;
-  var decryptKey = "";
+  let pasteData = req.body.data;
+  let decryptKey = "";
 
   if (req.body.encryptPaste) {
-    var encryptResult = encrypt(pasteData);
+    let encryptResult = encrypt(pasteData);
     pasteData = encryptResult.data;
     decryptKey = encryptResult.password;
   }
@@ -228,7 +228,7 @@ exports.create = async (req, res) => {
     return;
   }
 
-  var newPaste;
+  let newPaste;
   if (req.body.language) {
     newPaste = new Paste({
       language: req.body.language,
@@ -253,7 +253,7 @@ exports.create = async (req, res) => {
 };
 
 exports.uploadData = (req, res) => {
-  var fullUrl = 'https://' + req.get('host') + '/data/' + req.files[0].filename + '\n';
+  let fullUrl = 'https://' + req.get('host') + '/data/' + req.files[0].filename + '\n';
   res.writeHead(200, {
     "context-type": "text/plain"
   });
@@ -262,14 +262,14 @@ exports.uploadData = (req, res) => {
 }
 
 exports.getData = (req, res) => {
-  var file = req.params.file;
+  let file = req.params.file;
 
   if (file == "") {
     res.status(404).send("No valid input given.\n")
     return;
   }
 
-  var fullFile = appDir + '/uploads/' + file
+  let fullFile = appDir + '/uploads/' + file
   res.download(fullFile, function(err) {
     if (err) {
       console.log("File download error:");
@@ -279,8 +279,8 @@ exports.getData = (req, res) => {
 }
 
 exports.createRest = (req, res) => {
-  var language = req.params.language;
-  var lifetime = 0; // unlimited
+  let language = req.params.language;
+  let lifetime = 0; // unlimited
 
   if (req.body.data == "") {
     res.send({
@@ -290,7 +290,7 @@ exports.createRest = (req, res) => {
     return;
   }
 
-  var newPaste = new Paste({
+  let newPaste = new Paste({
     language: language,
     data: req.body,
     lifetime: lifetime,
@@ -299,7 +299,7 @@ exports.createRest = (req, res) => {
 
   newPaste.save(function(err) {
     if (!err) {
-      var fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id;
+      let fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id;
       res.json({
         id: newPaste._id,
         url: fullUrl

@@ -1,14 +1,14 @@
-var express = require('express');
-var app = express();
-var favicon = require('serve-favicon');
-var bodyParser = require('body-parser');
-var server = require('http').Server(app);
-var mongoose = require('mongoose');
-var path = require('path');
-var swig = require('swig-templates');
-var multer = require('multer');
+const express = require('express');
+const app = express();
+const favicon = require('serve-favicon');
+const bodyParser = require('body-parser');
+const server = require('http').Server(app);
+const mongoose = require('mongoose');
+const path = require('path');
+const swig = require('swig-templates');
+const multer = require('multer');
 
-var storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: function(req, file, cb) {
     cb(null, __dirname + '/uploads')
   },
@@ -17,7 +17,7 @@ var storage = multer.diskStorage({
   }
 })
 
-var upload = multer({
+const upload = multer({
   storage: storage,
   limits: {
     fileSize: 10485760
@@ -27,7 +27,7 @@ var upload = multer({
 server.listen(80);
 
 // Database connection
-var db = mongoose.connection;
+const db = mongoose.connection;
 
 db.on('connecting', () => console.log('connecting to MongoDB...'))
   .on('connected', () => console.log('MongoDB connected...'))
@@ -53,7 +53,7 @@ swig.setDefaults({
   cache: false
 });
 
-var pasteRoutes = require('./routes/pastes');
+const pasteRoutes = require('./routes/pastes');
 exports.app = app
 
 // Set favicon
