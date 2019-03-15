@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 var server = require('http').Server(app);
 var mongoose = require('mongoose');
 var path = require('path');
-var swig = require('swig');
+var swig = require('swig-templates');
 var multer = require('multer');
 
 var storage = multer.diskStorage({
