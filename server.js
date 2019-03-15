@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var favicon = require('serve-favicon');
 var bodyParser = require('body-parser');
 var server = require('http').Server(app);
 var mongoose = require('mongoose');
@@ -45,6 +46,9 @@ swig.setDefaults({
 
 var pasteRoutes = require('./routes/pastes');
 exports.app = app
+
+// Set favicon
+app.use(favicon(path.join(__dirname, 'public/images/paste_favicon.png')));
 
 app.use(bodyParser.json({
   limit: '5mb'
