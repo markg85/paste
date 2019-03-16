@@ -105,19 +105,16 @@ exports.paste = async (req, res) => {
   if (!id) {
     responseText = "No paste id provided."
   } else {
-    mongoose.model("Pastes").findOne({
-      _id: id
-    }, function(err, n) {
-      if (n) {
-        res.render('paste', {
-          title: "Paste",
-          url: n._id,
-          data: n
-        });
-      } else {
-        res.status(404).send("Paste not found.\n");
-      }
-    });
+    try {
+      let result = await mongoose.model("Pastes").findOne({ _id: id });
+      res.render('paste', {
+        title: "Paste",
+        url: result._id,
+        data: result
+      });
+    } catch(err) {
+      res.status(404).send("Paste not found.\n");
+    }
   }
 };
 
@@ -128,20 +125,17 @@ exports.pasteDecrypt = async (req, res) => {
   if (!id) {
     responseText = "No paste id provided."
   } else {
-    mongoose.model("Pastes").findOne({
-      _id: id
-    }, function(err, n) {
-      if (n) {
-        n.data = decrypt(n.data, req.params.decryptKey)
-        res.render('paste', {
-          title: "Paste",
-          url: n._id + "/" + req.params.decryptKey,
-          data: n
-        });
-      } else {
-        res.status(404).send("Paste not found.\n");
-      }
-    });
+    try {
+      let result = await mongoose.model("Pastes").findOne({ _id: id });
+      result.data = decrypt(result.data, req.params.decryptKey)
+      res.render('paste', {
+        title: "Paste",
+        url: result._id + "/" + req.params.decryptKey,
+        data: result
+      });
+    } catch(err) {
+      res.status(404).send("Paste not found.\n");
+    }
   }
 };
 
