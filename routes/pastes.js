@@ -6,7 +6,7 @@ const path = require('path');
 const appDir = path.dirname(require.main.filename);
 const algorithm = 'aes-256-ctr';
 
-const Schema = mongoose.Schema
+const Schema = mongoose.Schema          
 
 const lifeTimes = [3600, 14400, 86400, 604800, 1209600, 2419200, 31536000]
 
@@ -299,7 +299,7 @@ exports.createRest = (req, res) => {
 
   newPaste.save(function(err) {
     if (!err) {
-      let fullUrl = req.protocol + '://' + req.get('host') + '/' + newPaste._id;
+      let fullUrl = 'https://' + req.get('host') + '/' + newPaste._id;
       res.json({
         id: newPaste._id,
         url: fullUrl
