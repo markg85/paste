@@ -46,7 +46,8 @@ db.on('connecting', () => console.log('connecting to MongoDB...'))
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://mongo/paste', {
   useNewUrlParser: true,
-  useCreateIndex: true
+  useCreateIndex: true,
+  useUnifiedTopology: true
 });
 
 swig.setDefaults({
