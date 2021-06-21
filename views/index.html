@@ -17,10 +17,26 @@
     <script src="/js/prism.js"></script>
     <script src="/js/jquery-3.3.1.min.js"></script>
     <script src="/js/savy.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/qr-creator.min.js"></script>
     <script src="/js/paste.js"></script>
   </head>
   <body>
     <h1>{{ title }}</h1>
+
+    <!-- Modal -->
+    <div id="qrModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            </div>
+        </div>
+    </div>
     
     <form method="POST" id="pasteForm">
         <div class="form-group">
@@ -73,6 +89,9 @@
             <input type="hidden" name="action" id="action" value="encrypted_paste" />
             <button type="submit" class="btn btn-default" id="plain_paste">Paste</button>
             <button type="submit" class="btn btn-default" id="encrypted_paste">Paste encrypted</button>
+            <button type="submit" class="btn btn-default" id="qr_paste" data-toggle="tooltip" data-placement="bottom" title="Show the content of this paste in a QR. The paste wil NOT be pasted!">
+                <span class="glyphicon glyphicon-qrcode" aria-hidden="true"></span>
+            </button>
         </div>
     </form>
     

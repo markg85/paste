@@ -15,11 +15,28 @@
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/prism.js"></script>
     <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/savy.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/qr-creator.min.js"></script>
     <script src="/js/paste.js"></script>
   </head>
   <body>
+    <!-- Modal -->
+    <div id="qrModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    
     <h1><a href="/">{{ title }}</a></h1>
-    <a href="/{{ url }}">URL To paste</a> | <a href="/{{ url }}/raw">raw</a>
+    <a href="/{{ url }}">URL To paste</a> - <a href="javascript:qr('{{ url }}');"><span class="glyphicon glyphicon-qrcode"></a> | <a href="/{{ url }}/raw">raw</a> - <a href="javascript:qr('{{ url }}/raw');"><span class="glyphicon glyphicon-qrcode"></a>
     <pre class="line-numbers"><code class="language-{{ data.language }}">{{ data.data }}</code></pre>
   </body>
 </html>

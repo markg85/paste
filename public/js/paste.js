@@ -3,11 +3,37 @@ function toggleAction(e) {
    $('#action').val(target.attr('id'));
 }
 
+function qr(url = null) {
+    var content = $("#pasteContent").val()
+    if (url != null) {
+        content = window.location.origin + '/' + url
+    }
+    
+    $("#qrModal > div > div > div.modal-body").empty()
+    
+    QrCreator.render({
+        text: content,
+        radius: 0.5, // 0.0 to 0.5
+        ecLevel: 'Q', // L, M, Q, H
+        fill: '#536DFE', // foreground color
+        background: null, // color or null for transparent
+        size: 500 // in pixels
+    }, document.querySelector('#qrModal > div > div > div.modal-body'));
+    
+    $("#qrModal").modal()
+}
+
+function qrPaste(e) {
+    e.preventDefault();
+    qr();
+}
+
 $(document).ready(function(){
     
     $('.auto-save').savy('load');
     $('#plain_paste').on('click', toggleAction);
     $('#encrypted_paste').on('click', toggleAction);
+    $('#qr_paste').on('click', qrPaste);
     
     $( "#pasteForm" ).submit(function( event ) {
         // var passwordValue = $("#pastePassword").val();
