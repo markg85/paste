@@ -37,6 +37,8 @@
     
     <h1><a href="/">{{ title }}</a></h1>
     <a href="/{{ url }}">URL To paste</a> - <a href="javascript:qr('{{ url }}');"><span class="glyphicon glyphicon-qrcode"></a> | <a href="/{{ url }}/raw">raw</a> - <a href="javascript:qr('{{ url }}/raw');"><span class="glyphicon glyphicon-qrcode"></a>
-    <pre class="line-numbers"><code class="language-{{ data.language }}">{{ data.data }}</code></pre>
+    {{#each data}}
+      <pre class="line-numbers"><code class="language-{{ data.language }}">{{ this.data }}</code></pre>
+    {{/each}}
   </body>
 </html>

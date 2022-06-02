@@ -106,11 +106,11 @@ exports.paste = async (req, res) => {
     responseText = "No paste id provided."
   } else {
     try {
-      let result = await mongoose.model("Pastes").findOne({ _id: id });
+      let results = await mongoose.model("Pastes").find({ _id: id }).sort({date: 'desc'});
       res.render('paste', {
         title: "Paste",
-        url: result._id,
-        data: result
+        url: id,
+        data: results
       });
     } catch(err) {
       res.status(404).send("Paste not found.\n");
