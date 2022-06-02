@@ -42,7 +42,7 @@
       <pre class="line-numbers"><code class="language-{{ data.language }}">{{ paste.data }}</code></pre>
     {% endfor %}
 
-    <form method="POST" id="pasteForm">
+    <form method="POST" id="pasteForm" class="pasteFormPastePage">
       <div class="form-group">
           <div class="row">
               <!--
@@ -98,6 +98,9 @@
           </button>
       </div>
     </form>
+    <div class="btn-group pull-right" role="group" aria-label="...">
+      <button type="submit" class="btn btn-default" id="add_another_paste">Add another paste</button>
+    </div>
   
     <div class="clearfix"></div>
   </body>

@@ -28,12 +28,17 @@ function qrPaste(e) {
     qr();
 }
 
+function addAnotherPaste() {
+    $("#pasteForm").toggle()
+}
+
 $(document).ready(function(){
     
     $('.auto-save').savy('load');
     $('#plain_paste').on('click', toggleAction);
     $('#encrypted_paste').on('click', toggleAction);
     $('#qr_paste').on('click', qrPaste);
+    $('#add_another_paste').on('click', addAnotherPaste);
     
     $( "#pasteForm" ).submit(function( event ) {
         // var passwordValue = $("#pastePassword").val();
