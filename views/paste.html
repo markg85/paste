@@ -39,7 +39,7 @@
     {% for paste in data %}
       <a href="/{{ paste._id }}">URL To paste</a> - <a href="javascript:qr('{{ paste._id }}');"><span class="glyphicon glyphicon-qrcode"></a> | <a href="/{{ paste._id }}/raw">raw</a> - <a href="javascript:qr('{{ paste._id }}/raw');"><span class="glyphicon glyphicon-qrcode"></a>
       <i class="pasteDate">{{ paste.date.toString() }}</i>
-      <pre class="line-numbers"><code class="language-{{ data.language }}">{{ paste.data }}</code></pre>
+      <pre class="line-numbers"><code class="language-{{ paste.language }}">{{ paste.data }}</code></pre>
     {% endfor %}
 
     <form method="POST" id="pasteForm" class="pasteFormPastePage">
