@@ -38,7 +38,7 @@
     <h1><a href="/">{{ title }}</a></h1>
     {% for paste in data %}
       <a href="/{{ paste._id }}">URL To paste</a> - <a href="javascript:qr('{{ paste._id }}');"><span class="glyphicon glyphicon-qrcode"></a> | <a href="/{{ paste._id }}/raw">raw</a> - <a href="javascript:qr('{{ paste._id }}/raw');"><span class="glyphicon glyphicon-qrcode"></a>
-      <i class="pasteDate">Date: {{ paste.date.toString() }}</i>
+      <i class="pasteDate">{{ paste.date.toString() }}</i>
       <pre class="line-numbers"><code class="language-{{ data.language }}">{{ paste.data }}</code></pre>
     {% endfor %}
 
