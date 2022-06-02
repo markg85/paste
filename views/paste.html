@@ -36,9 +36,69 @@
     </div>
     
     <h1><a href="/">{{ title }}</a></h1>
-    <a href="/{{ url }}">URL To paste</a> - <a href="javascript:qr('{{ url }}');"><span class="glyphicon glyphicon-qrcode"></a> | <a href="/{{ url }}/raw">raw</a> - <a href="javascript:qr('{{ url }}/raw');"><span class="glyphicon glyphicon-qrcode"></a>
     {% for paste in data %}
+      <a href="/{{ paste._id }}">URL To paste</a> - <a href="javascript:qr('{{ paste._id }}');"><span class="glyphicon glyphicon-qrcode"></a> | <a href="/{{ paste._id }}/raw">raw</a> - <a href="javascript:qr('{{ paste._id }}/raw');"><span class="glyphicon glyphicon-qrcode"></a>
+      <i class="pasteDate">Date: {{ paste.date.toString() }}</i>
       <pre class="line-numbers"><code class="language-{{ data.language }}">{{ paste.data }}</code></pre>
     {% endfor %}
+
+    <form method="POST" id="pasteForm">
+      <div class="form-group">
+          <div class="row">
+              <!--
+              <div class="col-md-4">
+                  <label for="pastePassword">Paste password (leave as is for publicly visible)</label>
+                  <input type="text" class="form-control" id="pastePassword" placeholder="Password">
+              </div>
+              -->
+              <div class="col-md-6">
+                  <label for="langList">Paste language</label>
+                  <select class="form-control auto-save" id="langList">
+                      <option value="cpp">C++</option>
+                      <option value="c">C</option>
+                      <option value="bash">Bash</option>
+                      <option value="php">PHP</option>
+                      <option value="markup">HTML</option>
+                      <option value="json">JSON</option>
+                      <option value="diff">Diff</option>
+                      <option value="javascript">JavaScript</option>
+                      <option value="sql">SQL</option>
+                      <option value="markup">XML</option>
+                      <option value="none">Plain text</option>
+                  </select>
+              </div>
+              <div class="col-md-6">
+                  <label for="lifetimeList">Lifetime</label>
+                  <select class="form-control auto-save" id="lifetimeList">
+                      <option value="0">1 hour</option>
+                      <option value="1">4 hours</option>
+                      <option value="2">1 day</option>
+                      <option value="3">1 week</option>
+                      <option value="4">2 weeks</option>
+                      <option value="5" selected>1 month</option>
+                      <option value="6">1 year</option>
+                      <option value="7">As long as possible</option>
+                  </select>
+              </div>
+          </div>
+      </div>
+      <div class="form-group">
+          <label for="pasteContent">Data to paste</label>
+          <textarea class="form-control" id="pasteContent" rows="20" placeholder="Content"></textarea>
+      </div>
+      <!--
+      <button type="submit" class="btn btn-default pull-right">Paste</button>
+      -->
+      <div class="btn-group pull-right" role="group" aria-label="...">
+          <input type="hidden" name="action" id="action" value="encrypted_paste" />
+          <button type="submit" class="btn btn-default" id="plain_paste">Paste</button>
+          <button type="submit" class="btn btn-default" id="encrypted_paste">Paste encrypted</button>
+          <button type="submit" class="btn btn-default" id="qr_paste" data-toggle="tooltip" data-placement="bottom" title="Show the content of this paste in a QR. The paste wil NOT be pasted!">
+              <span class="glyphicon glyphicon-qrcode" aria-hidden="true"></span>
+          </button>
+      </div>
+    </form>
+  
+    <div class="clearfix"></div>
   </body>
 </html>

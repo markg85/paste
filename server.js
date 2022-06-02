@@ -93,7 +93,7 @@ app.get('/:id?', pasteRoutes.paste);
 app.get('/:id/raw', pasteRoutes.raw);
 app.get('/:id/:decryptKey?', pasteRoutes.pasteDecrypt);
 app.get('/:id/:decryptKey/raw', pasteRoutes.rawDecrypt);
-app.post('/', pasteRoutes.create);
+app.post('/:parent?', pasteRoutes.create);
 
 app.post('/data', upload.any(), pasteRoutes.uploadData);
 

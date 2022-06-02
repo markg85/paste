@@ -49,7 +49,7 @@ $(document).ready(function(){
         }
         
         // Post the data. Get the hash from the response and redirect to that url.
-        $.post( "/", { language: langValue, data: pasteData, encryptPaste: encryptPaste, lifetime: lifetimeValue })
+        $.post( window.location.pathname, { language: langValue, data: pasteData, encryptPaste: encryptPaste, lifetime: lifetimeValue })
             .done(function( data ) {
                 
                 console.log(data)

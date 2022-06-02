@@ -47,6 +47,10 @@ const pasteSchema = new Schema({
     type: String,
     'default': 'hashed'
   },
+  parent: {
+    type: String,
+    default: ""
+  },
   date: {
     type: Date,
     default: Date.now
@@ -106,10 +110,13 @@ exports.paste = async (req, res) => {
     responseText = "No paste id provided."
   } else {
     try {
-      let results = await mongoose.model("Pastes").find({ _id: id }).sort({date: 'desc'});
+      let result = await mongoose.model("Pastes").find({ _id: id });
+      let childs = await mongoose.model("Pastes").find({ parent: id });
+      let results = [...result, ...childs]
+      results.sort((a, b) => b.date.getTime() - a.date.getTime());
+
       res.render('paste', {
         title: "Paste",
-        url: id,
         data: results
       });
     } catch(err) {
@@ -222,9 +229,18 @@ exports.create = async (req, res) => {
     return;
   }
 
+  let parent = req.params.parent
+
+  if (!parent) {
+    parent = ""
+  }
+
+  console.log(`This paste has parent: ${parent}`)
+
   let newPaste;
   if (req.body.language) {
     newPaste = new Paste({
+      parent: parent,
       language: req.body.language,
       data: pasteData,
       lifetime: req.body.lifetime,
@@ -232,9 +248,12 @@ exports.create = async (req, res) => {
     });
     newPaste.save(function(err) {
 
+      // If we had a parent hash, we likely want to stay on that page we came from. The parent.
+      let returnId = (parent != "") ? parent : newPaste._id
+
       if (!err) {
         res.send({
-          hash: newPaste._id,
+          hash: returnId,
           decryptKey: decryptKey,
           error: "none"
         })
