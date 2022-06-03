@@ -293,6 +293,7 @@ exports.getData = (req, res) => {
 
 exports.createRest = (req, res) => {
   let language = req.params.language;
+  let parent = (!req.params?.parent) ? "" : req.params.parent;
   let lifetime = 0; // unlimited
 
   if (req.body.data == "") {
@@ -304,6 +305,7 @@ exports.createRest = (req, res) => {
   }
 
   let newPaste = new Paste({
+    parent: parent,
     language: language,
     data: req.body,
     lifetime: lifetime,

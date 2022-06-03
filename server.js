@@ -98,5 +98,6 @@ app.post('/:parent?', pasteRoutes.create);
 app.post('/data', upload.any(), pasteRoutes.uploadData);
 
 // Create a paste where the language is in the url. All the data is.. well.. in the data.
-// This does prevent provinding options like lifetime, but on the other hand opens the door to easily paste from the command line using curl.
+// This does prevent providing options like lifetime, but on the other hand opens the door to easily paste from the command line using curl.
+app.post('/api/:parent/:language', upload.any(), pasteRoutes.createRest);
 app.post('/api/:language', upload.any(), pasteRoutes.createRest);
