@@ -133,12 +133,16 @@ exports.pasteDecrypt = async (req, res) => {
     responseText = "No paste id provided."
   } else {
     try {
-      let result = await mongoose.model("Pastes").findOne({ _id: id });
-      result.data = decrypt(result.data, req.params.decryptKey)
+      let result = await mongoose.model("Pastes").find({ _id: id });
+      let childs = await mongoose.model("Pastes").find({ parent: id });
+      let results = [...result, ...childs]
+      results.sort((a, b) => b.date.getTime() - a.date.getTime());
+      results.every(element => element.data = decrypt(element.data, req.params.decryptKey));
+
       res.render('paste', {
         title: "Paste",
         url: result._id + "/" + req.params.decryptKey,
-        data: result
+        data: results
       });
     } catch(err) {
       res.status(404).send("Paste not found.\n");
