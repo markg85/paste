@@ -44,7 +44,7 @@ $(document).ready(function(){
         // var passwordValue = $("#pastePassword").val();
         var langValue = $("#langList").val();
         var pasteData = $("#pasteContent").val();
-        var lifetimeValue = $("#lifetimeList").val();
+        var lifetimeValue = JSON.parse($("#lifetimeList").val());
         var encryptPaste = ($("#action").val() == "encrypted_paste") ? true : false;
         
         if (pasteData == "") {
@@ -54,17 +54,31 @@ $(document).ready(function(){
         }
         
         // Post the data. Get the hash from the response and redirect to that url.
-        $.post( window.location.pathname, { language: langValue, data: pasteData, encryptPaste: encryptPaste, lifetime: lifetimeValue })
-            .done(function( data ) {
-                
-                console.log(data)
-                if (data.decryptKey != "") {
-                    window.location = "/" + data.hash + "/" + data.decryptKey;
-                } else {
-                    window.location = "/" + data.hash;
-                }
-        });
-        
+	
+
+        fetch(window.location.pathname, {
+          method: 'POST',
+          body: JSON.stringify({
+            language: langValue,
+            data: pasteData,
+            encryptedPaste: encryptPaste,
+            lifetime: lifetimeValue
+          }),
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+          }
+          })
+          .then(function(response){ 
+          return response.json()})
+          .then(function(data)
+          {
+            if (data.decryptKey != "") {
+              window.location = "/" + data.hash + "/" + data.decryptKey;
+            } else {
+              window.location = "/" + data.hash;
+          }
+        }).catch(error => console.error('Error:', error)); 
+
         //console.log(encryptPaste)
         
         event.preventDefault();

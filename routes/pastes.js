@@ -264,8 +264,7 @@ exports.create = async (req, res) => {
     req.body.lifetime = lifeTimes[req.body.lifetime]
   }
 
-  // Weird.. the "encryptPaste" value is a string, not a bool.. It does contain only "true" or "false" so just parsing it fixes it.
-  req.body.encryptPaste = JSON.parse(req.body.encryptPaste)
+//  console.log(req.body)
 
   let pasteData = req.body.data;
   let decryptKey = "";
