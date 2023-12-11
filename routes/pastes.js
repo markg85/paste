@@ -1,4 +1,3 @@
-const base58 = require('base58');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -10,16 +9,17 @@ const Schema = mongoose.Schema
 
 const lifeTimes = [3600, 14400, 86400, 604800, 1209600, 2419200, 31536000]
 
-async function generate(number) {
+async function generate(number = 5) {
 
-  let hash = () => {
-    let data = ''
-    for (let i = 0; i < 5; i++) {
-      data += base58.int_to_base58(Math.floor(Math.random() * 58))
+  const hash = (length = number) => {
+    const alphabet = '0123456789abcdefghjkmnpqrstvwxyz';
+    let result = '';
+    const charactersLength = alphabet.length;
+    for (let i = 0; i < length; i++) {
+      result += alphabet.charAt(Math.floor(Math.random() * charactersLength));
     }
-
-    return data;
-  };
+    return result;
+  }
 
   let newId = hash();
 
@@ -170,6 +170,57 @@ exports.raw = async (req, res) => {
   }
 };
 
+exports.rawNr = async (req, res) => {
+  let id = req.params.id
+  let nr = req.params.nr
+  let responseText = "";
+
+  if (id) {
+    try {
+      let result = await mongoose.model("Pastes").find({ _id: id });
+      let childs = await mongoose.model("Pastes").find({ parent: id });
+      let results = [...result, ...childs]
+      results.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+      if (results.length < nr) {
+        res.type('text/plain');
+        res.send(results[nr].data);
+      } else {
+        res.status(404).send(`Paste with nr: ${nr} doesn't exist in id: ${id}.\n`);
+      }
+    } catch(err) {
+      res.status(404).send("Paste not found.\n");
+    }
+  } else {
+    res.status(404).send("Paste not found.\n");
+  }
+};
+
+exports.rawLast = async (req, res) => {
+  let id = req.params.id
+  let responseText = "";
+
+  if (id) {
+    try {
+      let result = await mongoose.model("Pastes").find({ _id: id });
+      let childs = await mongoose.model("Pastes").find({ parent: id });
+      let results = [...result, ...childs]
+      results.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+      if (results.length) {
+        res.type('text/plain');
+        res.send(results.pop().data);
+      } else {
+        res.status(404).send(`No pastes found for ${id}.\n`);
+      }
+    } catch(err) {
+      res.status(404).send("Paste not found.\n");
+    }
+  } else {
+    res.status(404).send("Paste not found.\n");
+  }
+};
+
 exports.rawDecrypt = (req, res) => {
   let id = req.params.id
   let responseText = "";
@@ -237,9 +288,10 @@ exports.create = async (req, res) => {
 
   if (!parent) {
     parent = ""
+    console.log(`This paste is a top-level paste (no parent)`)
+  } else {
+    console.log(`This paste has parent: ${parent}`)
   }
-
-  console.log(`This paste has parent: ${parent}`)
 
   let newPaste;
   if (req.body.language) {
@@ -254,6 +306,8 @@ exports.create = async (req, res) => {
 
       // If we had a parent hash, we likely want to stay on that page we came from. The parent.
       let returnId = (parent != "") ? parent : newPaste._id
+
+      console.log(`ID: ${returnId}`)
 
       if (!err) {
         res.send({

@@ -91,6 +91,8 @@ app.get('/data/:file', pasteRoutes.getData);
 
 app.get('/:id?', pasteRoutes.paste);
 app.get('/:id/raw', pasteRoutes.raw);
+app.get('/:id/raw/:nr', pasteRoutes.rawNr);
+app.get('/:id/raw/last', pasteRoutes.rawLast);
 app.get('/:id/:decryptKey?', pasteRoutes.pasteDecrypt);
 app.get('/:id/:decryptKey/raw', pasteRoutes.rawDecrypt);
 app.post('/:parent?', pasteRoutes.create);
