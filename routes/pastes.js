@@ -180,9 +180,9 @@ exports.rawNr = async (req, res) => {
       let result = await mongoose.model("Pastes").find({ _id: id });
       let childs = await mongoose.model("Pastes").find({ parent: id });
       let results = [...result, ...childs]
-      results.sort((a, b) => b.date.getTime() - a.date.getTime());
+      results.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-      if (results.length < nr) {
+      if (results.length > nr) {
         res.type('text/plain');
         res.send(results[nr].data);
       } else {
@@ -205,7 +205,7 @@ exports.rawLast = async (req, res) => {
       let result = await mongoose.model("Pastes").find({ _id: id });
       let childs = await mongoose.model("Pastes").find({ parent: id });
       let results = [...result, ...childs]
-      results.sort((a, b) => b.date.getTime() - a.date.getTime());
+      results.sort((a, b) => a.date.getTime() - b.date.getTime());
 
       if (results.length) {
         res.type('text/plain');
