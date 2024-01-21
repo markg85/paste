@@ -110,10 +110,7 @@ exports.paste = async (req, res) => {
     responseText = "No paste id provided."
   } else {
     try {
-      let result = await mongoose.model("Pastes").find({ _id: id });
-      let childs = await mongoose.model("Pastes").find({ parent: id });
-      let results = [...result, ...childs]
-      results.sort((a, b) => b.date.getTime() - a.date.getTime());
+      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({$natural:-1});
 
       res.render('paste', {
         title: "Paste",
@@ -133,10 +130,7 @@ exports.pasteDecrypt = async (req, res) => {
     responseText = "No paste id provided."
   } else {
     try {
-      let result = await mongoose.model("Pastes").find({ _id: id });
-      let childs = await mongoose.model("Pastes").find({ parent: id });
-      let results = [...result, ...childs]
-      results.sort((a, b) => b.date.getTime() - a.date.getTime());
+      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({$natural:-1});
       results.every(element => element.data = decrypt(element.data, req.params.decryptKey));
 
       res.render('paste', {
@@ -173,14 +167,10 @@ exports.raw = async (req, res) => {
 exports.rawNr = async (req, res) => {
   let id = req.params.id
   let nr = req.params.nr
-  let responseText = "";
 
   if (id) {
     try {
-      let result = await mongoose.model("Pastes").find({ _id: id });
-      let childs = await mongoose.model("Pastes").find({ parent: id });
-      let results = [...result, ...childs]
-      results.sort((a, b) => a.date.getTime() - b.date.getTime());
+      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({$natural:-1});
 
       if (results.length > nr) {
         res.type('text/plain');
@@ -198,14 +188,10 @@ exports.rawNr = async (req, res) => {
 
 exports.rawLast = async (req, res) => {
   let id = req.params.id
-  let responseText = "";
 
   if (id) {
     try {
-      let result = await mongoose.model("Pastes").find({ _id: id });
-      let childs = await mongoose.model("Pastes").find({ parent: id });
-      let results = [...result, ...childs]
-      results.sort((a, b) => a.date.getTime() - b.date.getTime());
+      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({$natural:-1}).limit(1);
 
       if (results.length) {
         res.type('text/plain');
