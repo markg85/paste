@@ -110,7 +110,7 @@ exports.paste = async (req, res) => {
     responseText = "No paste id provided."
   } else {
     try {
-      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({$natural:-1});
+      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({date:-1});
 
       res.render('paste', {
         title: "Paste",
@@ -130,7 +130,7 @@ exports.pasteDecrypt = async (req, res) => {
     responseText = "No paste id provided."
   } else {
     try {
-      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({$natural:-1});
+      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({date:-1});
       results.every(element => element.data = decrypt(element.data, req.params.decryptKey));
 
       res.render('paste', {
@@ -170,7 +170,7 @@ exports.rawNr = async (req, res) => {
 
   if (id) {
     try {
-      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({$natural:-1});
+      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({date:-1});
 
       if (results.length > nr) {
         res.type('text/plain');
@@ -191,7 +191,7 @@ exports.rawLast = async (req, res) => {
 
   if (id) {
     try {
-      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({$natural:-1}).limit(1);
+      let results = await mongoose.model("Pastes").find({ $or: [{ _id: id }, { parent: id }] }).sort({date:-1}).limit(1);
 
       if (results.length) {
         res.type('text/plain');
