@@ -1,6 +1,6 @@
 const express = require("express");
 const favicon = require("serve-favicon");
-const bodyParser = "body-parser";
+const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const path = require("path");
 const swig = require("swig-templates");
@@ -75,6 +75,10 @@ app.use(bodyParser.urlencoded({ extended: true, limit: MAX_BODY_SIZE }));
 // --- Routes ---
 const pasteRoutes = require("./routes/pastes");
 
+// File upload and retrieval
+app.post("/data", upload.any(), pasteRoutes.uploadData);
+app.get("/data/:file", pasteRoutes.getData);
+
 // Page routes
 app.get("/", pasteRoutes.pastes);
 app.get("/:id", pasteRoutes.paste);
@@ -85,10 +89,6 @@ app.get("/:id/raw/:nr", pasteRoutes.rawNr);
 // Decryption routes
 app.get("/:id/:decryptKey", pasteRoutes.pasteDecrypt);
 app.get("/:id/:decryptKey/raw", pasteRoutes.rawDecrypt);
-
-// File upload and retrieval
-app.post("/data", upload.any(), pasteRoutes.uploadData);
-app.get("/data/:file", pasteRoutes.getData);
 
 // Paste creation routes
 app.post("/:parent?", pasteRoutes.create);

@@ -6,10 +6,8 @@ const path = require("path");
 const appDir = path.dirname(require.main.filename);
 
 // --- Constants ---
-// Modern, secure algorithm. Requires a 16-byte IV.
 const ALGORITHM = "aes-256-cbc";
 const IV_LENGTH = 16;
-// Lifetimes in seconds
 const lifeTimes = {
   "1h": 3600,
   "4h": 14400,
@@ -44,12 +42,10 @@ const pasteSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  // Data is stored as 'iv:encryptedData' if encrypted
   data: String,
 });
 
 // --- Model Middleware ---
-// Use a pre-validation hook to generate the ID, ensuring it exists before saving.
 pasteSchema.pre("validate", async function (next) {
   if (this.isNew) {
     try {
@@ -64,16 +60,11 @@ pasteSchema.pre("validate", async function (next) {
 const Paste = mongoose.model("Pastes", pasteSchema);
 
 // --- Helper Functions ---
-/**
- * Generates a short, unique, URL-friendly ID.
- * Retries if a collision is detected.
- */
 async function generateUniqueId(length = 5) {
   const alphabet = "0123456789abcdefghjkmnpqrstvwxyz";
   let newId;
 
   for (let i = 0; i < 10; i++) {
-    // Limit retries to prevent infinite loops
     newId = "";
     for (let j = 0; j < length; j++) {
       newId += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
@@ -81,22 +72,17 @@ async function generateUniqueId(length = 5) {
 
     const existing = await Paste.findOne({ _id: newId }).lean();
     if (!existing) {
-      return newId; // ID is unique
+      return newId;
     }
     console.log(`Hash collision for ID: ${newId}. Retrying...`);
   }
 
-  // If we exit the loop, it means we failed to generate a unique ID after several tries.
   throw new Error("Failed to generate a unique ID after multiple attempts. Increase hash length.");
 }
 
-/**
- * Encrypts text using aes-256-cbc.
- * Returns an object with the encryption key (password) and the iv:encrypted_data string.
- */
 function encrypt(text) {
   const iv = crypto.randomBytes(IV_LENGTH);
-  const password = crypto.randomBytes(32).toString("hex"); // Generate a secure, random key
+  const password = crypto.randomBytes(32).toString("hex");
   const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(password, "hex"), iv);
 
   let encrypted = cipher.update(text, "utf8", "hex");
@@ -104,13 +90,10 @@ function encrypt(text) {
 
   return {
     password: password,
-    data: `${iv.toString("hex")}:${encrypted}`, // Store IV with data
+    data: `${iv.toString("hex")}:${encrypted}`,
   };
 }
 
-/**
- * Decrypts an 'iv:encryptedData' string.
- */
 function decrypt(text, password) {
   try {
     const textParts = text.split(":");
@@ -165,7 +148,6 @@ exports.pasteDecrypt = async (req, res) => {
       return res.status(404).send("Paste not found.");
     }
 
-    // Decrypt data for each paste before rendering
     const decryptedResults = results.map((paste) => ({
       ...paste,
       data: paste.encrypted ? decrypt(paste.data, decryptKey) : "This paste is not encrypted.",
@@ -272,7 +254,7 @@ exports.create = async (req, res) => {
 
     let pasteData = req.body.data;
     let decryptKey = "";
-    const isEncrypted = req.body.encryptPaste === "true" || req.body.encryptPaste === true;
+    const isEncrypted = req.body.encryptedPaste === "true" || req.body.encryptedPaste === true;
 
     if (isEncrypted) {
       const encryptResult = encrypt(pasteData);
@@ -280,7 +262,7 @@ exports.create = async (req, res) => {
       decryptKey = encryptResult.password;
     }
 
-    const lifetimeKey = req.body.lifetime || "1m"; // Default lifetime
+    const lifetimeKey = req.body.lifetime || "1m";
     const lifetimeValue = lifeTimes[lifetimeKey] ?? lifeTimes["1m"];
 
     const newPaste = new Paste({
@@ -296,7 +278,7 @@ exports.create = async (req, res) => {
     const returnId = newPaste.parent || newPaste._id;
     res.status(201).json({
       hash: returnId,
-      decryptKey: decryptKey || "none", // Send back the key if created
+      decryptKey: decryptKey, // Returns the actual key if it exists, or an empty string "" if it does not.
       error: "none",
     });
   } catch (error) {
@@ -307,7 +289,6 @@ exports.create = async (req, res) => {
 
 exports.createRest = async (req, res) => {
   try {
-    // Expects raw text from 'body-parser.text' middleware
     const data = req.body;
     if (typeof data !== "string" || !data.trim()) {
       return res.status(400).json({ error: "Empty or invalid paste data received. This is not allowed!" });
@@ -317,7 +298,7 @@ exports.createRest = async (req, res) => {
       parent: req.params.parent || "",
       language: req.params.language,
       data: data,
-      lifetime: lifeTimes["inf"], // Unlimited
+      lifetime: lifeTimes["inf"],
       encrypted: false,
     });
 
@@ -338,8 +319,8 @@ exports.uploadData = (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).send("No file uploaded.");
   }
+
   const fileUrl = `${req.protocol}://${req.get("host")}/data/${req.files[0].filename}`;
-  // Corrected the header from 'context-type' to 'Content-Type'
   res.status(201).header("Content-Type", "text/plain").send(fileUrl);
 };
 
@@ -350,14 +331,9 @@ exports.getData = (req, res, next) => {
     return res.status(400).send("No valid file specified.");
   }
 
-  // --- SECURITY FIX: Path Traversal ---
-  // 1. Define the absolute path for the uploads directory.
   const uploadsDir = path.join(appDir, "uploads");
-  // 2. Join the requested filename to the uploads directory path.
-  //    path.join normalizes the path, helping to prevent '..' tricks.
   const requestedPath = path.join(uploadsDir, file);
-  // 3. Check if the resolved path is still inside the uploads directory.
-  //    This is the crucial step that prevents accessing parent directories.
+
   if (!requestedPath.startsWith(uploadsDir)) {
     return res.status(403).send("Forbidden: Access to this file is not allowed.");
   }
@@ -367,7 +343,6 @@ exports.getData = (req, res, next) => {
       if (err.code === "ENOENT") {
         return res.status(404).send("File not found.");
       }
-      // Pass other errors to the central error handler in server.js
       return next(err);
     }
   });
